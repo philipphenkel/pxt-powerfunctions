@@ -1,6 +1,6 @@
 {
     "name": "powerfunctions",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "A Power Functions package for pxt-microbit",
     "license": "MIT",
     "dependencies": {
@@ -11,7 +11,7 @@
         "README.md",
         "main.ts",
         "_locales/powerfunctions-strings.json",
-        "_locales/powerfunctions-jsdoc-strings.json" 
+        "_locales/powerfunctions-jsdoc-strings.json"
     ],
     "testFiles": [
         "test.ts"
