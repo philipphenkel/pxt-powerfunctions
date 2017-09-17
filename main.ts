@@ -32,72 +32,130 @@ enum PowerFunctionsCommand {
     Brake = 3,
 }
 
-//% weight=100 color=#0fbc11 icon=""
-namespace PowerFunctions {
+//% weight=99 color=#0fbc11 icon="\uf0e4"
+namespace powerfunctions {
 
     function sendSingleOutputCommand(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput, speed: number) {
-        const irDevice = new Transport.InfraredDevice(pin);
-        const msg = Message.createSingleOutputPwmMessage(channel, output, speed);
-        Transport.sendMessage(msg, irDevice);
+        const irDevice = new transport.InfraredDevice(pin);
+        const msg = message.createSingleOutputPwmMessage(channel, output, speed);
+        transport.sendMessage(msg, irDevice);
     }
 
     /**
-     * TODO: describe your function here
-     * @param irLed describe parameter here, eg: 5
-     * @param channel describe parameter here, eg: "Hello"
-     * @param output describe parameter here
-     * @param value describe parameter here
+     * Full speed forward on P0
      */
-    //% block 
+    //% blockId=pf_forward_p0
+    //% block="forward | on channel %channel | and output %output"
+    //% weight=100
+    export function forwardP0(channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
+        sendSingleOutputCommand(AnalogPin.P0, channel, output, 7);
+    }
+
+    /**
+     * Full speed backward on P0
+     */
+    //% blockId=pf_backward_p0
+    //% block="backward | on channel %channel | and output %output"
+    //% weight=90
+    export function backwardP0(channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
+        sendSingleOutputCommand(AnalogPin.P0, channel, output, 7);
+    }
+
+    /**
+     * Stop (float) on P0
+     */
+    //% blockId=pf_stop_p0
+    //% block="stop | on channel %channel | and output %output"
+    //% weight=80
+    export function stopP0(channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
+        sendSingleOutputCommand(AnalogPin.P0, channel, output, 8);
+    }
+
+
+    /**
+     * Full speed forward
+     */
+    //% blockId=pf_forward
+    //% block="forward | on pin %pin | with channel %channel | and output %output"
+    //% weight=100
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
+    //% advanced=true
+    export function forward(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
+        sendSingleOutputCommand(pin, channel, output, 7);
+    }
+
+    /**
+     * Full speed backward
+     */
+    //% blockId=powerfunctions_backward
+    //% block="backward| using pin %pin | on channel %channel | and output %output"
+    //% weight=90
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
+    //% advanced=true
+    export function backward(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
+        sendSingleOutputCommand(pin, channel, output, -7);
+    }
+
+    /**
+     * brake then float
+     */
+    //% blockId=powerfunctions_brake
+    //% block="brake| using pin %pin | on channel %channel | and output %output"
+    //% weight=80
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
+    //% advanced=true
+    export function brake(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
+        sendSingleOutputCommand(pin, channel, output, 0);
+    }
+
+    /**
+     * float
+     */
+    //% blockId=powerfunctions_float
+    //% block="float | using pin %pin | on channel %channel | and output %output"
+    //% weight=70
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
+    //% advanced=true
+    export function float(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
+        sendSingleOutputCommand(pin, channel, output, 8);
+    }
+
+    /**
+     * set PWM step
+     */
+    //% blockId=powerfunctions_set_speed
+    //% block="set speed | using pin %pin | on channel %channel | and output %output | to value %speed"
     //% speed.min=-7 speed.max=7
-    //"power functions send|pin %irLed|channel %step"
+    //% weight=10
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
+    //% advanced=true
     export function setSpeed(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput, speed: number) {
         speed = Math.max(-7, Math.min(7, speed));
         sendSingleOutputCommand(pin, channel, output, speed)
     }
 
-    //% block 
-    export function forward(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, 7);
-    }
-
-    //% block 
-    export function backward(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, -7);
-    }
-
-    //% block
-    export function stop(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, 0);
-    }
-
-    //% block 
-    export function float(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, 8);
-    }
-
     function test() {
 
-        //const msg = Message.createSingleOutputPwmMessage(Channel.One, Output.Red, 50);
-        //const msg = Message.createComboDirectMessage(Channel.One, Command.Forward, Command.Backward)
-        //const msg = Message.createComboPwmMessage(channel, 10, -10);
+        //const msg = message.createSingleOutputPwmMessage(Channel.One, Output.Red, 50);
+        //const msg = message.createComboDirectMessage(Channel.One, Command.Forward, Command.Backward)
+        //const msg = message.createComboPwmMessage(channel, 10, -10);
 
 
         // 1148
-        const c1RedFullForward = Message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 100);
+        const c1RedFullForward = message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 100);
         const expectedC1RedFullForward = 0b0000010001111100;
 
         // 1080
 
 
         // 407
-        const c1ComboRedForwardBlueBackward = Message.createComboDirectMessage(PowerFunctionsChannel.One, PowerFunctionsCommand.Forward, PowerFunctionsCommand.Backward)
+        const c1ComboRedForwardBlueBackward = message.createComboDirectMessage(PowerFunctionsChannel.One, PowerFunctionsCommand.Forward, PowerFunctionsCommand.Backward)
         const expectedC1ComboRedForwardBlueBackward = 0b0000000110010111;
 
     }
 
 
-    namespace Message {
+    namespace message {
 
         function mapValueToPwmElseFloat(value: number): number {
             switch (value) {
@@ -147,7 +205,7 @@ namespace PowerFunctions {
         }
     }
 
-    namespace Transport {
+    namespace transport {
 
         const IR_MARK = 6 * 1000000 / 38000
         const START_STOP_PAUSE = 39 * 1000000 / 38000
