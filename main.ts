@@ -1,5 +1,5 @@
-
 /**
+ * Power Functions RC Sender
  * (c) Philipp Henkel, 2017
  */
 
@@ -14,11 +14,37 @@ enum PowerFunctionsChannel {
     Four = 3,
 }
 
+enum PowerFunctionsDirection {
+    //% block="forward"
+    Forward = 1,
+    //% block="backward"
+    Backward = -1,
+}
+
 enum PowerFunctionsOutput {
     //% block="red"
     Red = 0,
     //% block="blue"
     Blue = 1
+}
+
+enum PowerFunctionsMotor {
+    //% block="red | channel 1"
+    Red1 = 0,
+    //% block="red | channel 2"
+    Red2 = 1,
+    //% block="red | channel 3"
+    Red3 = 2,
+    //% block="red | channel 4"
+    Red4 = 3,
+    //% block="blue | channel 1"
+    Blue1 = 4,
+    //% block="blue | channel 2"
+    Blue2 = 5,
+    //% block="blue | channel 3"
+    Blue3 = 6,
+    //% block="blue | channel 4"
+    Blue4 = 7,
 }
 
 enum PowerFunctionsCommand {
@@ -32,8 +58,37 @@ enum PowerFunctionsCommand {
     Brake = 3,
 }
 
-//% weight=99 color=#0fbc11 icon="\uf0e4"
+//% weight=99 color=#0fbc11 icon="\uf0e4" block="Power Functions"
 namespace powerfunctions {
+
+    let motorDirections = [
+        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Forward,
+    ]
+
+    let irLed = AnalogPin.P0
+
+    function getChannel(motor: PowerFunctionsMotor): PowerFunctionsChannel {
+        const MOTOR_TO_CHANNEL = [
+            PowerFunctionsChannel.One, PowerFunctionsChannel.Two, PowerFunctionsChannel.Three, PowerFunctionsChannel.Four,
+            PowerFunctionsChannel.One, PowerFunctionsChannel.Two, PowerFunctionsChannel.Three, PowerFunctionsChannel.Four
+        ];
+        return MOTOR_TO_CHANNEL[motor];
+    }
+
+    function getOutput(motor: PowerFunctionsMotor): PowerFunctionsOutput {
+        const MOTOR_TO_OUTPUT = [
+            PowerFunctionsOutput.Red, PowerFunctionsOutput.Red, PowerFunctionsOutput.Red, PowerFunctionsOutput.Red,
+            PowerFunctionsOutput.Blue, PowerFunctionsOutput.Blue, PowerFunctionsOutput.Blue, PowerFunctionsOutput.Blue
+        ];
+        return MOTOR_TO_OUTPUT[motor];
+    }
 
     function sendSingleOutputCommand(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput, speed: number) {
         const irDevice = new transport.InfraredDevice(pin);
@@ -42,104 +97,94 @@ namespace powerfunctions {
     }
 
     /**
-     * Full speed forward on P0
+     * Configures Infrared LED pin. A 940 nm emitting diode is required.
      */
-    //% blockId=pf_forward_p0
-    //% block="forward | on channel %channel | and output %output"
-    //% weight=100
-    export function forwardP0(channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(AnalogPin.P0, channel, output, 7);
-    }
-
-    /**
-     * Full speed backward on P0
-     */
-    //% blockId=pf_backward_p0
-    //% block="backward | on channel %channel | and output %output"
-    //% weight=90
-    export function backwardP0(channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(AnalogPin.P0, channel, output, 7);
-    }
-
-    /**
-     * Stop (float) on P0
-     */
-    //% blockId=pf_stop_p0
-    //% block="stop | on channel %channel | and output %output"
-    //% weight=80
-    export function stopP0(channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(AnalogPin.P0, channel, output, 8);
-    }
-
-
-    /**
-     * Full speed forward
-     */
-    //% blockId=pf_forward
-    //% block="forward | on pin %pin | with channel %channel | and output %output"
+    //% blockId=pf_use_ir_led_pin
+    //% block="use IR LED on pin %pin"
     //% weight=100
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
     //% advanced=true
-    export function forward(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, 7);
+    export function useIrLedPin(pin: AnalogPin) {
+        irLed = pin
     }
 
     /**
-     * Full speed backward
+     * Configures motor direction.
      */
-    //% blockId=powerfunctions_backward
-    //% block="backward| using pin %pin | on channel %channel | and output %output"
+    //% blockId=pf_set_motor_direction
+    //% block="set direction | of motor %motor | to %direction"
     //% weight=90
-    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
+    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     //% advanced=true
-    export function backward(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, -7);
+    export function setMotorDirection(motor: PowerFunctionsMotor, direction: PowerFunctionsDirection) {
+        motorDirections[motor] = direction;
     }
 
     /**
-     * brake then float
+     * Move motor forward.
+     */
+    //% blockId=pf_move_forward
+    //% block="move forward | with motor %motor"
+    //% weight=100
+    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
+    export function moveForward(motor: PowerFunctionsMotor) {
+        setSpeed(motor, 4)
+    }
+
+    /**
+     * Move motor backward.
+     */
+    //% blockId=pf_move_backward
+    //% block="move backward | with motor %motor"
+    //% weight=90
+    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
+    export function moveBackward(motor: PowerFunctionsMotor) {
+        setSpeed(motor, -4)
+    }
+
+    /**
+     * Brake then float.
+     * The motor's power is quickly reversed and thus the motor will stop abruptly.
      */
     //% blockId=powerfunctions_brake
-    //% block="brake| using pin %pin | on channel %channel | and output %output"
+    //% block="brake| motor %motor"
     //% weight=80
-    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
-    //% advanced=true
-    export function brake(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, 0);
+    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
+    export function brake(motor: PowerFunctionsMotor, speed: number) {
+        setSpeed(motor, 0);
     }
 
     /**
-     * float
+     * Float motor to stop.
+     * The motor's power is switched off and thus the motor will roll to a stop.
      */
-    //% blockId=powerfunctions_float
-    //% block="float | using pin %pin | on channel %channel | and output %output"
+    //% blockId=pf_float
+    //% block="float | motor %motor | to stop"
     //% weight=70
-    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
-    //% advanced=true
-    export function float(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput) {
-        sendSingleOutputCommand(pin, channel, output, 8);
+    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
+    export function float(motor: PowerFunctionsMotor) {
+        sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), 8);
     }
 
     /**
-     * set PWM step
+     * Set speed of motor.
      */
     //% blockId=powerfunctions_set_speed
-    //% block="set speed | using pin %pin | on channel %channel | and output %output | to value %speed"
+    //% block="set | motor %motor | to %speed"
     //% speed.min=-7 speed.max=7
-    //% weight=10
-    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
-    //% advanced=true
-    export function setSpeed(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput, speed: number) {
+    //% weight=60
+    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
+    export function setSpeed(motor: PowerFunctionsMotor, speed: number) {
         speed = Math.max(-7, Math.min(7, speed));
-        sendSingleOutputCommand(pin, channel, output, speed)
+        sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), speed * motorDirections[motor])
     }
+
 
     function test() {
 
         //const msg = message.createSingleOutputPwmMessage(Channel.One, Output.Red, 50);
         //const msg = message.createComboDirectMessage(Channel.One, Command.Forward, Command.Backward)
         //const msg = message.createComboPwmMessage(channel, 10, -10);
-
 
         // 1148
         const c1RedFullForward = message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 100);
@@ -151,7 +196,6 @@ namespace powerfunctions {
         // 407
         const c1ComboRedForwardBlueBackward = message.createComboDirectMessage(PowerFunctionsChannel.One, PowerFunctionsCommand.Forward, PowerFunctionsCommand.Backward)
         const expectedC1ComboRedForwardBlueBackward = 0b0000000110010111;
-
     }
 
 
@@ -262,11 +306,6 @@ namespace powerfunctions {
 
         function sendStart(device: InfraredDevice): void {
             device.transmitBit(IR_MARK, START_STOP_PAUSE)
-
-
-            /*while (true) {
-                device.transmitBit(IR_MARK, LOW_PAUSE)
-            }*/
         }
 
         function sendStop(device: InfraredDevice): void {
