@@ -11,14 +11,14 @@ enum PowerFunctionsChannel {
     //% block="3"
     Three = 2,
     //% block="4"
-    Four = 3,
+    Four = 3
 }
 
 enum PowerFunctionsDirection {
     //% block="forward"
     Forward = 1,
     //% block="backward"
-    Backward = -1,
+    Backward = -1
 }
 
 enum PowerFunctionsOutput {
@@ -44,7 +44,7 @@ enum PowerFunctionsMotor {
     //% block="blue | channel 3"
     Blue3 = 6,
     //% block="blue | channel 4"
-    Blue4 = 7,
+    Blue4 = 7
 }
 
 enum PowerFunctionsCommand {
@@ -55,7 +55,7 @@ enum PowerFunctionsCommand {
     //% block="backward"
     Backward = 2,
     //% block="brake"
-    Brake = 3,
+    Brake = 3
 }
 
 //% weight=99 color=#0fbc11 icon="\uf0e4" block="Power Functions"
@@ -78,22 +78,24 @@ namespace powerfunctions {
         const MOTOR_TO_CHANNEL = [
             PowerFunctionsChannel.One, PowerFunctionsChannel.Two, PowerFunctionsChannel.Three, PowerFunctionsChannel.Four,
             PowerFunctionsChannel.One, PowerFunctionsChannel.Two, PowerFunctionsChannel.Three, PowerFunctionsChannel.Four
-        ];
-        return MOTOR_TO_CHANNEL[motor];
+        ]
+        return MOTOR_TO_CHANNEL[motor]
     }
 
     function getOutput(motor: PowerFunctionsMotor): PowerFunctionsOutput {
         const MOTOR_TO_OUTPUT = [
             PowerFunctionsOutput.Red, PowerFunctionsOutput.Red, PowerFunctionsOutput.Red, PowerFunctionsOutput.Red,
             PowerFunctionsOutput.Blue, PowerFunctionsOutput.Blue, PowerFunctionsOutput.Blue, PowerFunctionsOutput.Blue
-        ];
-        return MOTOR_TO_OUTPUT[motor];
+        ]
+        return MOTOR_TO_OUTPUT[motor]
     }
 
     function sendSingleOutputCommand(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput, speed: number) {
-        const irDevice = new transport.InfraredDevice(pin);
-        const msg = message.createSingleOutputPwmMessage(channel, output, speed);
-        transport.sendMessage(msg, irDevice);
+        control.inBackground(() => {
+            const irDevice = new transport.InfraredDevice(pin)
+            const msg = message.createSingleOutputPwmMessage(channel, output, speed)
+            transport.sendMessage(msg, irDevice)
+        })
     }
 
     /**
@@ -101,7 +103,7 @@ namespace powerfunctions {
      */
     //% blockId=pf_use_ir_led_pin
     //% block="use IR LED on %pin"
-    //% weight=100
+    //% weight=20
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
     //% advanced=true
     export function useIrLedPin(pin: AnalogPin) {
@@ -113,11 +115,11 @@ namespace powerfunctions {
      */
     //% blockId=pf_set_motor_direction
     //% block="set direction | of motor %motor | to %direction"
-    //% weight=90
+    //% weight=10
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     //% advanced=true
     export function setMotorDirection(motor: PowerFunctionsMotor, direction: PowerFunctionsDirection) {
-        motorDirections[motor] = direction;
+        motorDirections[motor] = direction
     }
 
     /**
@@ -151,7 +153,7 @@ namespace powerfunctions {
     //% weight=80
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     export function brake(motor: PowerFunctionsMotor, speed: number) {
-        setSpeed(motor, 0);
+        setSpeed(motor, 0)
     }
 
     /**
@@ -163,7 +165,7 @@ namespace powerfunctions {
     //% weight=70
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     export function float(motor: PowerFunctionsMotor) {
-        sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), 8);
+        sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), 8)
     }
 
     /**
@@ -175,7 +177,7 @@ namespace powerfunctions {
     //% weight=60
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     export function setSpeed(motor: PowerFunctionsMotor, speed: number) {
-        speed = Math.max(-7, Math.min(7, speed));
+        speed = Math.max(-7, Math.min(7, speed))
         sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), speed * motorDirections[motor])
     }
 
@@ -203,28 +205,28 @@ namespace powerfunctions {
         }
 
         function nibblesToMessage(nibble1: number, nibble2: number, nibble3: number) {
-            const lrc = 0xF ^ nibble1 ^ nibble2 ^ nibble3;
-            return (nibble1 << 12) | (nibble2 << 8) | (nibble3 << 4) | lrc;
+            const lrc = 0xF ^ nibble1 ^ nibble2 ^ nibble3
+            return (nibble1 << 12) | (nibble2 << 8) | (nibble3 << 4) | lrc
         }
 
         export function createSingleOutputPwmMessage(channel: PowerFunctionsChannel, output: PowerFunctionsOutput, value: number) {
-            const nibble1 = 0b0000 + channel;
-            const nibble2 = 0b0100 + output;
-            const nibble3 = mapValueToPwmElseFloat(value);
+            const nibble1 = 0b0000 + channel
+            const nibble2 = 0b0100 + output
+            const nibble3 = mapValueToPwmElseFloat(value)
             return nibblesToMessage(nibble1, nibble2, nibble3)
         }
 
         export function createComboDirectMessage(channel: PowerFunctionsChannel, outputRed: PowerFunctionsCommand, outputBlue: PowerFunctionsCommand) {
-            const nibble1 = 0b0000 + channel;
-            const nibble2 = 0b0001;
+            const nibble1 = 0b0000 + channel
+            const nibble2 = 0b0001
             const nibble3 = (outputBlue << 2) + outputRed
             return nibblesToMessage(nibble1, nibble2, nibble3)
         }
 
         export function createComboPwmMessage(channel: PowerFunctionsChannel, outputRed: number, outputBlue: number) {
-            const nibble1 = 0b0100 + channel;
-            const nibble2 = mapValueToPwmElseFloat(outputBlue);
-            const nibble3 = mapValueToPwmElseFloat(outputRed);
+            const nibble1 = 0b0100 + channel
+            const nibble2 = mapValueToPwmElseFloat(outputBlue)
+            const nibble3 = mapValueToPwmElseFloat(outputRed)
             return nibblesToMessage(nibble1, nibble2, nibble3)
         }
     }
@@ -237,7 +239,8 @@ namespace powerfunctions {
         const HIGH_PAUSE = 21 * 1000000 / 38000
 
         export class InfraredDevice {
-            private pin: AnalogPin;
+            private pin: AnalogPin
+
             constructor(
                 pin: AnalogPin,
                 pwmPeriod = 26
@@ -251,9 +254,9 @@ namespace powerfunctions {
             // microbit correction -65, -150
             transmitBit(markMicroSeconds: number, pauseMicroSeconds: number): void {
                 pins.analogWritePin(this.pin, 511)
-                control.waitMicros(Math.max(1, markMicroSeconds - 65));
+                control.waitMicros(Math.max(1, markMicroSeconds - 65))
                 pins.analogWritePin(this.pin, 0)
-                control.waitMicros(Math.max(1, pauseMicroSeconds - 150));
+                control.waitMicros(Math.max(1, pauseMicroSeconds - 150))
             }
         }
 
@@ -274,11 +277,11 @@ namespace powerfunctions {
         }
 
         export function sendMessage(message: number, device: InfraredDevice): void {
-            const MAX_LENGTH_MS = 16;
-            const channel = 1 + ((message >> 12) & 0b0011);
+            const MAX_LENGTH_MS = 16
+            const channel = 1 + ((message >> 12) & 0b0011)
 
             for (let sendCount = 0; sendCount < 5; sendCount++) {
-                const MESSAGE_BITS = 16;
+                const MESSAGE_BITS = 16
 
                 sendStart(device)
 
@@ -303,19 +306,19 @@ namespace powerfunctions {
 
     function test() {
 
-        //const msg = message.createSingleOutputPwmMessage(Channel.One, Output.Red, 50);
+        //const msg = message.createSingleOutputPwmMessage(Channel.One, Output.Red, 50)
         //const msg = message.createComboDirectMessage(Channel.One, Command.Forward, Command.Backward)
-        //const msg = message.createComboPwmMessage(channel, 10, -10);
+        //const msg = message.createComboPwmMessage(channel, 10, -10)
 
         // 1148
-        const c1RedFullForward = message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 100);
-        const expectedC1RedFullForward = 0b0000010001111100;
+        const c1RedFullForward = message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 100)
+        const expectedC1RedFullForward = 0b0000010001111100
 
         // 1080
 
 
         // 407
         const c1ComboRedForwardBlueBackward = message.createComboDirectMessage(PowerFunctionsChannel.One, PowerFunctionsCommand.Forward, PowerFunctionsCommand.Backward)
-        const expectedC1ComboRedForwardBlueBackward = 0b0000000110010111;
+        const expectedC1ComboRedForwardBlueBackward = 0b0000000110010111
     }
 }
