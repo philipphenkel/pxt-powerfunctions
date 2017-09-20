@@ -100,7 +100,7 @@ namespace powerfunctions {
      * Configures Infrared LED pin. A 940 nm emitting diode is required.
      */
     //% blockId=pf_use_ir_led_pin
-    //% block="use IR LED on pin %pin"
+    //% block="use IR LED on %pin"
     //% weight=100
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
     //% advanced=true
@@ -179,26 +179,6 @@ namespace powerfunctions {
         sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), speed * motorDirections[motor])
     }
 
-
-    function test() {
-
-        //const msg = message.createSingleOutputPwmMessage(Channel.One, Output.Red, 50);
-        //const msg = message.createComboDirectMessage(Channel.One, Command.Forward, Command.Backward)
-        //const msg = message.createComboPwmMessage(channel, 10, -10);
-
-        // 1148
-        const c1RedFullForward = message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 100);
-        const expectedC1RedFullForward = 0b0000010001111100;
-
-        // 1080
-
-
-        // 407
-        const c1ComboRedForwardBlueBackward = message.createComboDirectMessage(PowerFunctionsChannel.One, PowerFunctionsCommand.Forward, PowerFunctionsCommand.Backward)
-        const expectedC1ComboRedForwardBlueBackward = 0b0000000110010111;
-    }
-
-
     namespace message {
 
         function mapValueToPwmElseFloat(value: number): number {
@@ -222,11 +202,9 @@ namespace powerfunctions {
             }
         }
 
-        export function createComboDirectMessage(channel: PowerFunctionsChannel, outputA: PowerFunctionsCommand, outputB: PowerFunctionsCommand) {
-            const nibble1 = 0b0000 + channel;
-            const nibble2 = 0b0001;
-            const nibble3 = (outputB << 2) + outputA
-            return nibblesToMessage(nibble1, nibble2, nibble3)
+        function nibblesToMessage(nibble1: number, nibble2: number, nibble3: number) {
+            const lrc = 0xF ^ nibble1 ^ nibble2 ^ nibble3;
+            return (nibble1 << 12) | (nibble2 << 8) | (nibble3 << 4) | lrc;
         }
 
         export function createSingleOutputPwmMessage(channel: PowerFunctionsChannel, output: PowerFunctionsOutput, value: number) {
@@ -236,16 +214,18 @@ namespace powerfunctions {
             return nibblesToMessage(nibble1, nibble2, nibble3)
         }
 
-        export function createComboPwmMessage(channel: PowerFunctionsChannel, outputA: number, outputB: number) {
-            const nibble1 = 0b0100 + channel;
-            const nibble2 = mapValueToPwmElseFloat(outputB);
-            const nibble3 = mapValueToPwmElseFloat(outputA);
+        export function createComboDirectMessage(channel: PowerFunctionsChannel, outputRed: PowerFunctionsCommand, outputBlue: PowerFunctionsCommand) {
+            const nibble1 = 0b0000 + channel;
+            const nibble2 = 0b0001;
+            const nibble3 = (outputBlue << 2) + outputRed
             return nibblesToMessage(nibble1, nibble2, nibble3)
         }
 
-        function nibblesToMessage(nibble1: number, nibble2: number, nibble3: number) {
-            const lrc = 0xF ^ nibble1 ^ nibble2 ^ nibble3;
-            return (nibble1 << 12) | (nibble2 << 8) | (nibble3 << 4) | lrc;
+        export function createComboPwmMessage(channel: PowerFunctionsChannel, outputRed: number, outputBlue: number) {
+            const nibble1 = 0b0100 + channel;
+            const nibble2 = mapValueToPwmElseFloat(outputBlue);
+            const nibble3 = mapValueToPwmElseFloat(outputRed);
+            return nibblesToMessage(nibble1, nibble2, nibble3)
         }
     }
 
@@ -277,6 +257,22 @@ namespace powerfunctions {
             }
         }
 
+        function sendStart(device: InfraredDevice): void {
+            device.transmitBit(IR_MARK, START_STOP_PAUSE)
+        }
+
+        function sendStop(device: InfraredDevice): void {
+            device.transmitBit(IR_MARK, START_STOP_PAUSE)
+        }
+
+        function sendLow(device: InfraredDevice): void {
+            device.transmitBit(IR_MARK, LOW_PAUSE)
+        }
+
+        function sendHigh(device: InfraredDevice): void {
+            device.transmitBit(IR_MARK, HIGH_PAUSE)
+        }
+
         export function sendMessage(message: number, device: InfraredDevice): void {
             const MAX_LENGTH_MS = 16;
             const channel = 1 + ((message >> 12) & 0b0011);
@@ -303,21 +299,23 @@ namespace powerfunctions {
                 }
             }
         }
+    }
 
-        function sendStart(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, START_STOP_PAUSE)
-        }
+    function test() {
 
-        function sendStop(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, START_STOP_PAUSE)
-        }
+        //const msg = message.createSingleOutputPwmMessage(Channel.One, Output.Red, 50);
+        //const msg = message.createComboDirectMessage(Channel.One, Command.Forward, Command.Backward)
+        //const msg = message.createComboPwmMessage(channel, 10, -10);
 
-        function sendLow(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, LOW_PAUSE)
-        }
+        // 1148
+        const c1RedFullForward = message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 100);
+        const expectedC1RedFullForward = 0b0000010001111100;
 
-        function sendHigh(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, HIGH_PAUSE)
-        }
+        // 1080
+
+
+        // 407
+        const c1ComboRedForwardBlueBackward = message.createComboDirectMessage(PowerFunctionsChannel.One, PowerFunctionsCommand.Forward, PowerFunctionsCommand.Backward)
+        const expectedC1ComboRedForwardBlueBackward = 0b0000000110010111;
     }
 }
