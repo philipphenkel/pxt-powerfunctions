@@ -204,7 +204,7 @@ namespace powerfunctions {
             }
         }
 
-        function nibblesToMessage(nibble1: number, nibble2: number, nibble3: number) {
+        function createMessageFromNibbles(nibble1: number, nibble2: number, nibble3: number) {
             const lrc = 0xF ^ nibble1 ^ nibble2 ^ nibble3
             return (nibble1 << 12) | (nibble2 << 8) | (nibble3 << 4) | lrc
         }
@@ -213,21 +213,21 @@ namespace powerfunctions {
             const nibble1 = 0b0000 + channel
             const nibble2 = 0b0100 + output
             const nibble3 = mapValueToPwmElseFloat(value)
-            return nibblesToMessage(nibble1, nibble2, nibble3)
+            return createMessageFromNibbles(nibble1, nibble2, nibble3)
         }
 
         export function createComboDirectMessage(channel: PowerFunctionsChannel, outputRed: PowerFunctionsCommand, outputBlue: PowerFunctionsCommand) {
             const nibble1 = 0b0000 + channel
             const nibble2 = 0b0001
             const nibble3 = (outputBlue << 2) + outputRed
-            return nibblesToMessage(nibble1, nibble2, nibble3)
+            return createMessageFromNibbles(nibble1, nibble2, nibble3)
         }
 
         export function createComboPwmMessage(channel: PowerFunctionsChannel, outputRed: number, outputBlue: number) {
             const nibble1 = 0b0100 + channel
             const nibble2 = mapValueToPwmElseFloat(outputBlue)
             const nibble3 = mapValueToPwmElseFloat(outputRed)
-            return nibblesToMessage(nibble1, nibble2, nibble3)
+            return createMessageFromNibbles(nibble1, nibble2, nibble3)
         }
     }
 
