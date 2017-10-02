@@ -4,8 +4,7 @@
     "description": "A Power Functions package for pxt-microbit",
     "license": "MIT",
     "dependencies": {
-        "core": "*",
-        "radio": "*"
+        "core": "*"
     },
     "files": [
         "README.md",
