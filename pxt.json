@@ -1,6 +1,6 @@
 {
     "name": "powerfunctions",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A Power Functions package for pxt-microbit",
     "license": "MIT",
     "dependencies": {
