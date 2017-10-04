@@ -102,7 +102,7 @@ namespace powerfunctions {
      * Configures Infrared LED pin. A 940 nm emitting diode is required.
      */
     //% blockId=pf_use_ir_led_pin
-    //% block="use IR LED on %pin"
+    //% block="use IR LED on pin %pin"
     //% weight=20
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
     //% advanced=true
@@ -130,7 +130,7 @@ namespace powerfunctions {
     //% weight=100
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     export function moveForward(motor: PowerFunctionsMotor) {
-        setSpeed(motor, 4)
+        setSpeed(motor, 3)
     }
 
     /**
@@ -141,7 +141,7 @@ namespace powerfunctions {
     //% weight=90
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     export function moveBackward(motor: PowerFunctionsMotor) {
-        setSpeed(motor, -4)
+        setSpeed(motor, -3)
     }
 
     /**
