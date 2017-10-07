@@ -1,5 +1,7 @@
 /**
- * Power Functions RC Sender
+ * Power Functions IR Sender
+ * Control your Power Functions motors using your micro:bit, an infrared LED and MakeCode.
+ *
  * (c) Philipp Henkel, 2017
  */
 
@@ -99,7 +101,7 @@ namespace powerfunctions {
     }
 
     /**
-     * Configures Infrared LED pin. A 940 nm emitting diode is required.
+     * Configures the infrared LED pin. A 940 nm emitting diode is required.
      */
     //% blockId=pf_use_ir_led_pin
     //% block="use IR LED on pin %pin"
@@ -111,7 +113,7 @@ namespace powerfunctions {
     }
 
     /**
-     * Configures motor direction.
+     * Configures a motor direction.
      */
     //% blockId=pf_set_motor_direction
     //% block="set direction | of motor %motor | to %direction"
@@ -123,7 +125,7 @@ namespace powerfunctions {
     }
 
     /**
-     * Move motor forward.
+     * Move a motor forward.
      */
     //% blockId=pf_move_forward
     //% block="move forward | with motor %motor"
@@ -134,7 +136,7 @@ namespace powerfunctions {
     }
 
     /**
-     * Move motor backward.
+     * Move a motor backward.
      */
     //% blockId=pf_move_backward
     //% block="move backward | with motor %motor"
@@ -157,7 +159,7 @@ namespace powerfunctions {
     }
 
     /**
-     * Float motor to stop.
+     * Float a motor to stop.
      * The motor's power is switched off and thus the motor will roll to a stop.
      */
     //% blockId=pf_float

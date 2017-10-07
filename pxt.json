@@ -1,7 +1,7 @@
 {
-    "name": "powerfunctions",
+    "name": "power-functions",
     "version": "1.0.1",
-    "description": "A Power Functions package for pxt-microbit",
+    "description": " Control your Lego® Power Functions motors using your micro:bit, an infrared LED and MakeCode. This package is neither endorsed nor authorized by the LEGO Group.",
     "license": "MIT",
     "dependencies": {
         "core": "*"

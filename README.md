@@ -1,7 +1,7 @@
 # pxt-powerfunctions - Power Functions IR Sender
 
 Control your LEGO® Power Functions motors using your micro:bit, an infrared LED and MakeCode.
-This package turns your micro:bit into a remote control for your LEGO® Power Functions devices.
+This package turns your micro:bit into a remote control for your Power Functions devices.
 
 ## MakeCode Blocks Example
 
@@ -42,7 +42,9 @@ LEGO® is a trademark of the LEGO Group of companies which does not sponsor, aut
 
 ## License
 
-MIT
+Copyright (C) 2017 Philipp Henkel
+
+Licensed under the MIT License (MIT). See LICENSE file for more details.
 
 ## Supported targets
 
