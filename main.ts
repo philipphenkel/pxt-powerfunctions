@@ -1,9 +1,16 @@
 /**
  * Power Functions IR Sender
- * Control your Power Functions motors using your micro:bit, an infrared LED and MakeCode.
+ * Control your Power Functions motors using your PXT device, an infrared LED and MakeCode.
  *
- * (c) Philipp Henkel, 2017
+ * (c) 2017-2018, Philipp Henkel
  */
+
+/* Board specific configuration */
+namespace BoardConfig {
+    export const DefaultPin = AnalogPin.P0;
+    export const MarkTimingCorrectionMicroSeconds = -65;
+    export const PauseTimingCorrectionMicroSeconds = -150;
+}
 
 enum PowerFunctionsChannel {
     //% block="1"
@@ -74,7 +81,7 @@ namespace powerfunctions {
         PowerFunctionsDirection.Forward,
     ]
 
-    let irLed = AnalogPin.P0
+    let irLed = BoardConfig.DefaultPin;
 
     function getChannel(motor: PowerFunctionsMotor): PowerFunctionsChannel {
         const MOTOR_TO_CHANNEL = [
@@ -171,7 +178,7 @@ namespace powerfunctions {
     }
 
     /**
-     * Set speed of motor.
+     * Set speed of a motor.
      */
     //% blockId=powerfunctions_set_speed
     //% block="set | motor %motor | to %speed"
@@ -252,13 +259,11 @@ namespace powerfunctions {
                 pins.analogSetPeriod(this.pin, pwmPeriod)
             }
 
-            // calliope correction -85, -210
-            // microbit correction -65, -150
             transmitBit(markMicroSeconds: number, pauseMicroSeconds: number): void {
                 pins.analogWritePin(this.pin, 511)
-                control.waitMicros(Math.max(1, markMicroSeconds - 65))
+                control.waitMicros(Math.max(1, markMicroSeconds + BoardConfig.MarkTimingCorrectionMicroSeconds))
                 pins.analogWritePin(this.pin, 0)
-                control.waitMicros(Math.max(1, pauseMicroSeconds - 150))
+                control.waitMicros(Math.max(1, pauseMicroSeconds + BoardConfig.PauseTimingCorrectionMicroSeconds))
             }
         }
 
