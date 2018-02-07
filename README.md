@@ -3,6 +3,9 @@
 Control your LEGO® Power Functions motors using your micro:bit, an infrared LED and MakeCode.
 This package turns your micro:bit into a remote control for your Power Functions devices.
 
+## Installation
+Open MakeCode and add this package via Add Package in the Advanced menu. You need to enter our project URL https://github.com/philipphenkel/pxt-powerfunctions, hit return and then select the power-functions package.
+
 ## MakeCode Blocks Example
 
 ![alt text](https://github.com/philipphenkel/pxt-powerfunctions/raw/master/code_example.png "MakeCode Blocks Example")
@@ -42,7 +45,7 @@ LEGO® is a trademark of the LEGO Group of companies which does not sponsor, aut
 
 ## License
 
-Copyright (C) 2017 Philipp Henkel
+Copyright (C) 2017, 2018 Philipp Henkel
 
 Licensed under the MIT License (MIT). See LICENSE file for more details.
 
