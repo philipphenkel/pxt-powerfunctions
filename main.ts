@@ -161,7 +161,7 @@ namespace powerfunctions {
     //% block="brake| motor %motor"
     //% weight=80
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
-    export function brake(motor: PowerFunctionsMotor, speed: number) {
+    export function brake(motor: PowerFunctionsMotor) {
         setSpeed(motor, 0)
     }
 
