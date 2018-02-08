@@ -1,7 +1,7 @@
 powerfunctions.runTests()
 
 basic.showIcon(IconNames.Heart)
-powerfunctions.useIrLedPin(AnalogPin.P0)
+powerfunctions.useIrLedPin(AnalogPin.P1)
 powerfunctions.setMotorDirection(PowerFunctionsMotor.Blue1, PowerFunctionsDirection.Backward)
 
 input.onButtonPressed(Button.A, () => {

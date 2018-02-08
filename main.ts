@@ -1,13 +1,13 @@
 /**
  * Power Functions IR Sender
- * Control your Power Functions motors using your PXT device, an infrared LED and MakeCode.
+ * Control your Power Functions motors using your micro:bit or Calliope-Mini, an infrared LED and MakeCode.
  *
  * (c) 2017-2018, Philipp Henkel
  */
 
 /* Board specific configuration */
 namespace BoardConfig {
-    export const DefaultPin = AnalogPin.P0;
+    export const DefaultPin = AnalogPin.P1;
     export const MarkTimingCorrectionMicroSeconds = -65;
     export const PauseTimingCorrectionMicroSeconds = -150;
 }
@@ -82,7 +82,9 @@ namespace powerfunctions {
     ]
 
     let irLed = BoardConfig.DefaultPin;
-
+    let markTimingCorrectionMicroSeconds = BoardConfig.MarkTimingCorrectionMicroSeconds;
+    let pauseTimingCorrectionMicroSeconds = BoardConfig.PauseTimingCorrectionMicroSeconds;
+    
     function getChannel(motor: PowerFunctionsMotor): PowerFunctionsChannel {
         const MOTOR_TO_CHANNEL = [
             PowerFunctionsChannel.One, PowerFunctionsChannel.Two, PowerFunctionsChannel.Three, PowerFunctionsChannel.Four,
@@ -112,7 +114,7 @@ namespace powerfunctions {
      */
     //% blockId=pf_use_ir_led_pin
     //% block="use IR LED on pin %pin"
-    //% weight=20
+    //% weight=30
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
     //% advanced=true
     export function useIrLedPin(pin: AnalogPin) {
@@ -124,11 +126,31 @@ namespace powerfunctions {
      */
     //% blockId=pf_set_motor_direction
     //% block="set direction | of motor %motor | to %direction"
-    //% weight=10
+    //% weight=20
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     //% advanced=true
     export function setMotorDirection(motor: PowerFunctionsMotor, direction: PowerFunctionsDirection) {
         motorDirections[motor] = direction
+    }
+
+    /**
+     * Adjust timing configuration to reach the required IR precision.
+     * Due to the overhead of function calls the sleep intervals during transmission of IR commands need to be shortened.
+     * Timing depends on both the device and the MakeCode version.
+     * Recommended default values are -65 micro seconds for the IR mark and -150 micro seconds for the pause.
+     */
+    //% blockId=pf_adjust_ir_timing
+    //% block="adjust timing | of IR mark %markMicroSeconds | and pause %pauseMicroSeconds"
+    //% weight=10
+    //% markMicroSeconds.min=-157 markMicroSeconds.max=0
+    //% pauseMicroSeconds.min=-263 pauseMicroSeconds.max=0
+    //% advanced=true
+    export function adjustIrTiming(
+        markMicroSeconds: number = BoardConfig.MarkTimingCorrectionMicroSeconds,
+        pauseMicroSeconds: number = BoardConfig.PauseTimingCorrectionMicroSeconds)
+    {
+        markTimingCorrectionMicroSeconds = markMicroSeconds;
+        pauseTimingCorrectionMicroSeconds = pauseMicroSeconds;
     }
 
     /**
@@ -261,9 +283,9 @@ namespace powerfunctions {
 
             transmitBit(markMicroSeconds: number, pauseMicroSeconds: number): void {
                 pins.analogWritePin(this.pin, 511)
-                control.waitMicros(Math.max(1, markMicroSeconds + BoardConfig.MarkTimingCorrectionMicroSeconds))
+                control.waitMicros(Math.max(1, markMicroSeconds + markTimingCorrectionMicroSeconds))
                 pins.analogWritePin(this.pin, 0)
-                control.waitMicros(Math.max(1, pauseMicroSeconds + BoardConfig.PauseTimingCorrectionMicroSeconds))
+                control.waitMicros(Math.max(1, pauseMicroSeconds + pauseTimingCorrectionMicroSeconds))
             }
         }
 

@@ -1,7 +1,7 @@
 # pxt-powerfunctions - Power Functions IR Sender
 
-Control your LEGO® Power Functions motors using your micro:bit, an infrared LED and MakeCode.
-This package turns your micro:bit into a remote control for your Power Functions devices.
+Control your LEGO® Power Functions motors using your micro:bit or Calliope-Mini, an infrared LED and MakeCode.
+This package turns your device into a remote control for your Power Functions devices.
 
 ## Installation
 Open MakeCode and add this package via Add Package in the Advanced menu. You need to enter our project URL https://github.com/philipphenkel/pxt-powerfunctions, hit return and then select the power-functions package.
@@ -14,7 +14,7 @@ Open MakeCode and add this package via Add Package in the Advanced menu. You nee
 
 ```javascript
 basic.showIcon(IconNames.Heart)
-powerfunctions.useIrLedPin(AnalogPin.P0)
+powerfunctions.useIrLedPin(AnalogPin.P1)
 powerfunctions.setMotorDirection(PowerFunctionsMotor.Blue1, PowerFunctionsDirection.Backward)
 
 input.onButtonPressed(Button.A, () => {
@@ -26,10 +26,8 @@ input.onButtonPressed(Button.B, () => {
 })
 
 basic.forever(() => {
-    led.plotBarGraph(
-    input.lightLevel(),
-    255
-    )
+    led.plotBarGraph(input.lightLevel(), 255)
+
     if (input.lightLevel() > 200) {
         powerfunctions.float(PowerFunctionsMotor.Blue1)
         basic.pause(5000)
@@ -52,4 +50,5 @@ Licensed under the MIT License (MIT). See LICENSE file for more details.
 ## Supported targets
 
 * for PXT/microbit
+* for PXT/calliope
 
