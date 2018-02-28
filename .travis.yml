@@ -6,6 +6,7 @@ script:
     - "pxt target microbit"
     - "pxt install"
     - "pxt build"
+    - "pxt test"
 sudo: false
 cache:
     directories:
