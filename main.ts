@@ -2,15 +2,8 @@
  * Power Functions IR Sender
  * Control your Power Functions motors using your micro:bit or Calliope-Mini, an infrared LED and MakeCode.
  *
- * (c) 2017-2018, Philipp Henkel
+ * (c) 2017-2019, Philipp Henkel
  */
-
-/* Board specific configuration */
-namespace BoardConfig {
-    export const DefaultPin = AnalogPin.P1;
-    export const MarkTimingCorrectionMicroSeconds = -65;
-    export const PauseTimingCorrectionMicroSeconds = -150;
-}
 
 enum PowerFunctionsChannel {
     //% block="1"
@@ -70,21 +63,13 @@ enum PowerFunctionsCommand {
 //% weight=99 color=#0fbc11 icon="\uf0e4" block="Power Functions"
 namespace powerfunctions {
 
-    let motorDirections = [
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-    ]
+    interface PowerFunctionsState {
+        irDevice: InfraredDevice
+        motorDirections: PowerFunctionsDirection[]
+    }
 
-    let irLed = BoardConfig.DefaultPin;
-    let markTimingCorrectionMicroSeconds = BoardConfig.MarkTimingCorrectionMicroSeconds;
-    let pauseTimingCorrectionMicroSeconds = BoardConfig.PauseTimingCorrectionMicroSeconds;
-    
+    let state: PowerFunctionsState
+
     function getChannel(motor: PowerFunctionsMotor): PowerFunctionsChannel {
         const MOTOR_TO_CHANNEL = [
             PowerFunctionsChannel.One, PowerFunctionsChannel.Two, PowerFunctionsChannel.Three, PowerFunctionsChannel.Four,
@@ -101,87 +86,62 @@ namespace powerfunctions {
         return MOTOR_TO_OUTPUT[motor]
     }
 
-    function sendSingleOutputCommand(pin: AnalogPin, channel: PowerFunctionsChannel, output: PowerFunctionsOutput, speed: number) {
-        control.inBackground(() => {
-            const irDevice = new transport.InfraredDevice(pin)
-            const msg = message.createSingleOutputPwmMessage(channel, output, speed)
-            transport.sendMessage(msg, irDevice)
-        })
+    function sendSingleOutputCommand(channel: PowerFunctionsChannel, output: PowerFunctionsOutput, speed: number) {
+        const msg = message.createSingleOutputPwmMessage(channel, output, speed)
+        if (state) {
+            state.irDevice.sendMessage(msg)
+        }
     }
 
     /**
      * Configures the infrared LED pin. A 940 nm emitting diode is required.
+     * @param pin pin an attached IR LED
      */
-    //% blockId=pf_use_ir_led_pin
-    //% block="use IR LED on pin %pin"
-    //% weight=30
-    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
-    //% advanced=true
-    export function useIrLedPin(pin: AnalogPin) {
-        irLed = pin
-    }
-
-    /**
-     * Configures a motor direction.
-     */
-    //% blockId=pf_set_motor_direction
-    //% block="set direction | of motor %motor | to %direction"
-    //% weight=20
-    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
-    //% advanced=true
-    export function setMotorDirection(motor: PowerFunctionsMotor, direction: PowerFunctionsDirection) {
-        motorDirections[motor] = direction
-    }
-
-    /**
-     * Adjust timing configuration to reach the required IR precision.
-     * Due to the overhead of function calls the sleep intervals during transmission of IR commands need to be shortened.
-     * Timing depends on both the device and the MakeCode version.
-     * Recommended default values are -65 micro seconds for the IR mark and -150 micro seconds for the pause.
-     */
-    //% blockId=pf_adjust_ir_timing
-    //% block="adjust timing | of IR mark %markMicroSeconds | and pause %pauseMicroSeconds"
-    //% weight=10
-    //% markMicroSeconds.min=-157 markMicroSeconds.max=0
-    //% pauseMicroSeconds.min=-263 pauseMicroSeconds.max=0
-    //% advanced=true
-    export function adjustIrTiming(
-        markMicroSeconds: number = BoardConfig.MarkTimingCorrectionMicroSeconds,
-        pauseMicroSeconds: number = BoardConfig.PauseTimingCorrectionMicroSeconds)
-    {
-        markTimingCorrectionMicroSeconds = markMicroSeconds;
-        pauseTimingCorrectionMicroSeconds = pauseMicroSeconds;
-    }
-
-    /**
-     * Move a motor forward.
-     */
-    //% blockId=pf_move_forward
-    //% block="move forward | with motor %motor"
-    //% weight=100
-    //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
-    export function moveForward(motor: PowerFunctionsMotor) {
-        setSpeed(motor, 3)
-    }
-
-    /**
-     * Move a motor backward.
-     */
-    //% blockId=pf_move_backward
-    //% block="move backward | with motor %motor"
+    //% blockId=pf_initialize_ir_led
+    //% block="initialize IR LED on pin %pin"
     //% weight=90
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
+    export function initializeIrLed(pin: AnalogPin) {
+        state = {
+            irDevice: new InfraredDevice(pin),
+            motorDirections: [
+                PowerFunctionsDirection.Forward,
+                PowerFunctionsDirection.Forward,
+                PowerFunctionsDirection.Forward,
+                PowerFunctionsDirection.Forward,
+                PowerFunctionsDirection.Forward,
+                PowerFunctionsDirection.Forward,
+                PowerFunctionsDirection.Forward,
+                PowerFunctionsDirection.Forward,
+            ]
+        }
+    }
+
+    /**
+     * Set speed of a motor.
+     * @param motor the motor
+     * @param speed speed of the motor, eg: 3
+     */
+    //% blockId=powerfunctions_set_speed
+    //% block="set | motor %motor | to %speed"
+    //% speed.min=-7 speed.max=7
+    //% weight=80
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
-    export function moveBackward(motor: PowerFunctionsMotor) {
-        setSpeed(motor, -3)
+    export function setSpeed(motor: PowerFunctionsMotor, speed: number) {
+        speed = Math.max(-7, Math.min(7, speed))
+        if (state) {
+            sendSingleOutputCommand(getChannel(motor), getOutput(motor), speed * state.motorDirections[motor])
+        }
     }
 
     /**
      * Brake then float.
      * The motor's power is quickly reversed and thus the motor will stop abruptly.
+     * @param motor the motor
      */
     //% blockId=powerfunctions_brake
     //% block="brake| motor %motor"
-    //% weight=80
+    //% weight=75
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     export function brake(motor: PowerFunctionsMotor) {
         setSpeed(motor, 0)
@@ -190,26 +150,31 @@ namespace powerfunctions {
     /**
      * Float a motor to stop.
      * The motor's power is switched off and thus the motor will roll to a stop.
+     * @param motor the motor
      */
     //% blockId=pf_float
     //% block="float | motor %motor | to stop"
     //% weight=70
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
     export function float(motor: PowerFunctionsMotor) {
-        sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), 8)
+        if (state) {
+            sendSingleOutputCommand(getChannel(motor), getOutput(motor), 8)
+        }
     }
 
     /**
-     * Set speed of a motor.
+     * Configures a motor direction.
+     * @param motor the motor
+     * @param direction the direction
      */
-    //% blockId=powerfunctions_set_speed
-    //% block="set | motor %motor | to %speed"
-    //% speed.min=-7 speed.max=7
-    //% weight=60
+    //% blockId=pf_set_motor_direction
+    //% block="set direction | of motor %motor | to %direction"
+    //% weight=20
     //% motor.fieldEditor="gridpicker" motor.fieldOptions.columns=4 motor.fieldOptions.tooltips="false"
-    export function setSpeed(motor: PowerFunctionsMotor, speed: number) {
-        speed = Math.max(-7, Math.min(7, speed))
-        sendSingleOutputCommand(irLed, getChannel(motor), getOutput(motor), speed * motorDirections[motor])
+    export function setMotorDirection(motor: PowerFunctionsMotor, direction: PowerFunctionsDirection) {
+        if (state) {
+            state.motorDirections[motor] = direction
+        }
     }
 
     namespace message {
@@ -262,67 +227,92 @@ namespace powerfunctions {
         }
     }
 
-    namespace transport {
+    const IR_MARK = Math.idiv(6 * 1000000, 38000)
+    const START_STOP_PAUSE = Math.idiv((45 - 6) * 1000000, 38000)
+    const LOW_PAUSE = Math.idiv((16 - 6) * 1000000, 38000)
+    const HIGH_PAUSE = Math.idiv((27 - 6) * 1000000, 38000)
 
-        const IR_MARK = 6 * 1000000 / 38000
-        const START_STOP_PAUSE = 39 * 1000000 / 38000
-        const LOW_PAUSE = 10 * 1000000 / 38000
-        const HIGH_PAUSE = 21 * 1000000 / 38000
+    export class InfraredDevice {
+        private pin: AnalogPin
+        private writeAndWaitEffort: number
+        private messageProcessingEffort: number
 
-        export class InfraredDevice {
-            private pin: AnalogPin
+        constructor(
+            pin: AnalogPin,
+            pwmPeriod = 26
+        ) {
+            this.pin = pin
+            pins.analogWritePin(this.pin, 0)
+            pins.analogSetPeriod(this.pin, pwmPeriod)
 
-            constructor(
-                pin: AnalogPin,
-                pwmPeriod = 26
-            ) {
-                this.pin = pin
-                pins.analogWritePin(this.pin, 0)
-                pins.analogSetPeriod(this.pin, pwmPeriod)
+            // Meassure analogWrite and wait effort
+            {
+                const start = input.runningTimeMicros()
+                for (let i = 0; i < 8; i++) {
+                    pins.analogWritePin(this.pin, 511)
+                    control.waitMicros(1)
+                }
+                const end = input.runningTimeMicros()
+                this.writeAndWaitEffort += end - start
+                this.writeAndWaitEffort = this.writeAndWaitEffort >> 3
             }
 
-            transmitBit(markMicroSeconds: number, pauseMicroSeconds: number): void {
-                pins.analogWritePin(this.pin, 511)
-                control.waitMicros(Math.max(1, markMicroSeconds + markTimingCorrectionMicroSeconds))
-                pins.analogWritePin(this.pin, 0)
-                control.waitMicros(Math.max(1, pauseMicroSeconds + pauseTimingCorrectionMicroSeconds))
+            // Meassure message processing effort
+            {
+                const MESSAGE_BITS = 16
+                let mask = 1 << (MESSAGE_BITS - 1)
+                const message = 232
+
+                const start = input.runningTimeMicros()
+                while (mask > 0) {
+                    if (message & mask) {
+                        this.transmitBitCallibrationDummy(IR_MARK, HIGH_PAUSE)
+                    } else {
+                        this.transmitBitCallibrationDummy(IR_MARK, LOW_PAUSE)
+                    }
+                    mask >>= 1
+                }
+                const end = input.runningTimeMicros()
+                this.messageProcessingEffort += end - start
+                this.messageProcessingEffort >>= 4
             }
+
+            // Make sure we have a pause between callibration and first message
+            control.waitMicros(2000)
         }
 
-        function sendStart(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, START_STOP_PAUSE)
+        public transmitBit(markMicroSeconds: number, pauseMicroSeconds: number): void {
+            pins.analogWritePin(this.pin, 511)
+            control.waitMicros(markMicroSeconds - this.writeAndWaitEffort)
+            pins.analogWritePin(this.pin, 1)
+            control.waitMicros(Math.max(1, pauseMicroSeconds - this.writeAndWaitEffort - this.messageProcessingEffort))
         }
 
-        function sendStop(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, START_STOP_PAUSE)
+        private transmitBitCallibrationDummy(markMicroSeconds: number, pauseMicroSeconds: number): void {
+            const p1 = markMicroSeconds - this.writeAndWaitEffort
         }
 
-        function sendLow(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, LOW_PAUSE)
-        }
-
-        function sendHigh(device: InfraredDevice): void {
-            device.transmitBit(IR_MARK, HIGH_PAUSE)
-        }
-
-        export function sendMessage(message: number, device: InfraredDevice): void {
+        public sendMessage(message: number): void {
             const MAX_LENGTH_MS = 16
             const channel = 1 + ((message >> 12) & 0b0011)
 
             for (let sendCount = 0; sendCount < 5; sendCount++) {
                 const MESSAGE_BITS = 16
 
-                sendStart(device)
+                let mask = 1 << (MESSAGE_BITS - 1)
 
-                for (let mask = 1 << (MESSAGE_BITS - 1); mask > 0; mask >>= 1) {
+                this.transmitBit(IR_MARK, START_STOP_PAUSE)
+
+                while (mask > 0) {
                     if (message & mask) {
-                        sendHigh(device)
+                        this.transmitBit(IR_MARK, HIGH_PAUSE)
                     } else {
-                        sendLow(device)
+                        this.transmitBit(IR_MARK, LOW_PAUSE)
                     }
+                    mask >>= 1
                 }
 
-                sendStop(device)
+                this.transmitBit(IR_MARK, START_STOP_PAUSE)
 
                 if (sendCount == 0 || sendCount == 1) {
                     basic.pause(5 * MAX_LENGTH_MS)
@@ -335,7 +325,6 @@ namespace powerfunctions {
 
 
     export function runTests() {
-
         {
             const c1RedFullForward = message.createSingleOutputPwmMessage(PowerFunctionsChannel.One, PowerFunctionsOutput.Red, 7)
             const expectedC1RedFullForward = 0b0000010001111100 // 1148

@@ -14,11 +14,11 @@ Open MakeCode and add this package via Add Package in the Advanced menu. You nee
 
 ```javascript
 basic.showIcon(IconNames.Heart)
-powerfunctions.useIrLedPin(AnalogPin.P1)
+powerfunctions.initializeIrLed(AnalogPin.P1)
 powerfunctions.setMotorDirection(PowerFunctionsMotor.Blue1, PowerFunctionsDirection.Backward)
 
 input.onButtonPressed(Button.A, () => {
-    powerfunctions.moveForward(PowerFunctionsMotor.Blue1)
+    powerfunctions.setSpeed(PowerFunctionsMotor.Blue1, 3)
 })
 
 input.onButtonPressed(Button.B, () => {
@@ -43,7 +43,7 @@ LEGO® is a trademark of the LEGO Group of companies which does not sponsor, aut
 
 ## License
 
-Copyright (C) 2017, 2018 Philipp Henkel
+Copyright (C) 2017-2019 Philipp Henkel
 
 Licensed under the MIT License (MIT). See LICENSE file for more details.
 
@@ -51,4 +51,3 @@ Licensed under the MIT License (MIT). See LICENSE file for more details.
 
 * for PXT/microbit
 * for PXT/calliope
-

@@ -1,11 +1,11 @@
 powerfunctions.runTests()
 
 basic.showIcon(IconNames.Heart)
-powerfunctions.useIrLedPin(AnalogPin.P1)
+powerfunctions.initializeIrLed(AnalogPin.P1)
 powerfunctions.setMotorDirection(PowerFunctionsMotor.Blue1, PowerFunctionsDirection.Backward)
 
 input.onButtonPressed(Button.A, () => {
-    powerfunctions.moveForward(PowerFunctionsMotor.Blue1)
+    powerfunctions.setSpeed(PowerFunctionsMotor.Blue1, 4)
 })
 
 input.onButtonPressed(Button.B, () => {
@@ -24,4 +24,3 @@ basic.forever(() => {
         basic.pause(3000)
     }
 })
-
