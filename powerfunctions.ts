@@ -284,7 +284,7 @@ namespace powerfunctions {
         public transmitBit(markMicroSeconds: number, pauseMicroSeconds: number): void {
             pins.analogWritePin(this.pin, 511)
             control.waitMicros(markMicroSeconds - this.writeAndWaitEffort)
-            pins.analogWritePin(this.pin, 1)
+            pins.analogWritePin(this.pin, 0)
             control.waitMicros(Math.max(1, pauseMicroSeconds - this.writeAndWaitEffort - this.messageProcessingEffort))
         }
 
