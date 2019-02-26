@@ -1,0 +1,15 @@
+{
+  "PowerFunctionsChannel": "パワーファンクション用赤外線送信\r\nMicro:bitやCalliope-Miniと赤外線LED、MakeCodeを使用してパワーファンクションのモーターを制御します。\r\n* (c) 2017-2019, Philipp Henkel\r\nLocalized to Japanese by Yasuhiro ISHII, 日本語への翻訳 : 石井 康寛",
+  "powerfunctions.brake": "ブレーキ\r\nモーターを短時間逆転することで急ブレーキをかけ停止します。",
+  "powerfunctions.brake|param|motor": "モーター",
+  "powerfunctions.float": "モーター停止\r\nモーターの電源をオフにします。モーターは慣性モーメントによって回転しながら停止します。",
+  "powerfunctions.float|param|motor": "モーター",
+  "powerfunctions.initializeIrLed": "赤外線LEDを接続するピンを指定します。波長940nm(ナノメートル)の赤外線LEDを接続します。",
+  "powerfunctions.initializeIrLed|param|pin": "赤外線LEDを接続するピン",
+  "powerfunctions.setMotorDirection": "モーター回転方向の指定",
+  "powerfunctions.setMotorDirection|param|direction": "回転方向",
+  "powerfunctions.setMotorDirection|param|motor": "モーター",
+  "powerfunctions.setSpeed": "モーターのスピードの設定",
+  "powerfunctions.setSpeed|param|motor": "モーター",
+  "powerfunctions.setSpeed|param|speed": "モーターのスピード。例) 3"
+}
