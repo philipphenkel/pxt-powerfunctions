@@ -6,6 +6,10 @@ This extension turns your device into a remote control for your Power Functions 
 ## Installation
 Open MakeCode and select '+ Extensions' in the 'Advanced' menu. You need to enter our project URL https://github.com/philipphenkel/pxt-powerfunctions in the search field, hit return and then select the powerfunctions extension.
 
+The following MakeCode versions are supported:
+- https://makecode.microbit.org/v0
+- https://makecode.microbit.org/v1
+
 ## MakeCode Blocks Example
 
 ![alt text](https://github.com/philipphenkel/pxt-powerfunctions/raw/master/code_example.png "MakeCode Blocks Example")
@@ -43,7 +47,7 @@ LEGO® is a trademark of the LEGO Group of companies which does not sponsor, aut
 
 ## License
 
-Copyright (C) 2017-2019 Philipp Henkel
+Copyright (C) 2017-2020 Philipp Henkel
 
 Licensed under the MIT License (MIT). See LICENSE file for more details.
 
