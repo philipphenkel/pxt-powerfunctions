@@ -2,7 +2,7 @@
  * Power Functions IR Sender
  * Control your Power Functions motors using your micro:bit or Calliope-Mini, an infrared LED and MakeCode.
  *
- * (c) 2017-2019, Philipp Henkel
+ * (c) 2017-2020, Philipp Henkel
  */
 
 enum PowerFunctionsChannel {
@@ -287,95 +287,63 @@ namespace powerfunctions {
 
   export class InfraredDevice {
     private pin: AnalogPin;
-    private writeAndWaitEffort: number;
-    private messageProcessingEffort: number;
+    private waitCorrection: number;
 
     constructor(pin: AnalogPin, pwmPeriod = 26) {
       this.pin = pin;
       pins.analogWritePin(this.pin, 0);
       pins.analogSetPeriod(this.pin, pwmPeriod);
 
-      // Meassure analogWrite and wait effort
+      // Measure the time we need for a minimal bit (analogWritePin and waitMicros)
       {
         const start = input.runningTimeMicros();
-        for (let i = 0; i < 8; i++) {
-          pins.analogWritePin(this.pin, 511);
-          control.waitMicros(1);
+        const runs = 8;
+        for (let i = 0; i < runs; i++) {
+          this.transmitBit(1, 1);
         }
         const end = input.runningTimeMicros();
-        this.writeAndWaitEffort += end - start;
-        this.writeAndWaitEffort = this.writeAndWaitEffort >> 3;
+        this.waitCorrection = Math.idiv(end - start - runs * 2, runs * 2);
       }
 
-      // Meassure message processing effort
-      {
-        const MESSAGE_BITS = 16;
-        let mask = 1 << (MESSAGE_BITS - 1);
-        const message = 232;
-
-        const start = input.runningTimeMicros();
-        while (mask > 0) {
-          if (message & mask) {
-            this.transmitBitCallibrationDummy(IR_MARK, HIGH_PAUSE);
-          } else {
-            this.transmitBitCallibrationDummy(IR_MARK, LOW_PAUSE);
-          }
-          mask >>= 1;
-        }
-        const end = input.runningTimeMicros();
-        this.messageProcessingEffort += end - start;
-        this.messageProcessingEffort >>= 4;
-      }
-
-      // Make sure we have a pause between callibration and first message
+      // Insert a pause between callibration and first message
       control.waitMicros(2000);
     }
 
-    public transmitBit(
-      markMicroSeconds: number,
-      pauseMicroSeconds: number
-    ): void {
+    public transmitBit(highMicros: number, lowMicros: number): void {
       pins.analogWritePin(this.pin, 511);
-      control.waitMicros(markMicroSeconds - this.writeAndWaitEffort);
-      pins.analogWritePin(this.pin, 0);
-      control.waitMicros(
-        Math.max(
-          1,
-          pauseMicroSeconds -
-            this.writeAndWaitEffort -
-            this.messageProcessingEffort
-        )
-      );
-    }
-
-    private transmitBitCallibrationDummy(
-      markMicroSeconds: number,
-      pauseMicroSeconds: number
-    ): void {
-      const p1 = markMicroSeconds - this.writeAndWaitEffort;
+      control.waitMicros(highMicros);
+      pins.analogWritePin(this.pin, 1);
+      control.waitMicros(lowMicros);
     }
 
     public sendMessage(message: number): void {
       const MAX_LENGTH_MS = 16;
       const channel = 1 + ((message >> 12) & 0b0011);
+      const ir_mark = IR_MARK - this.waitCorrection;
+      const high_pause = HIGH_PAUSE - this.waitCorrection;
+      const low_pause = LOW_PAUSE - this.waitCorrection;
+      const start_stop_pause = START_STOP_PAUSE - this.waitCorrection;
 
       for (let sendCount = 0; sendCount < 5; sendCount++) {
         const MESSAGE_BITS = 16;
 
         let mask = 1 << (MESSAGE_BITS - 1);
 
-        this.transmitBit(IR_MARK, START_STOP_PAUSE);
+        // start bit
+        this.transmitBit(ir_mark, start_stop_pause);
 
+        // low and high bits
         while (mask > 0) {
           if (message & mask) {
-            this.transmitBit(IR_MARK, HIGH_PAUSE);
+            this.transmitBit(ir_mark, high_pause);
           } else {
-            this.transmitBit(IR_MARK, LOW_PAUSE);
+            this.transmitBit(ir_mark, low_pause);
           }
           mask >>= 1;
         }
 
-        this.transmitBit(IR_MARK, START_STOP_PAUSE);
+        // stop bit
+        this.transmitBit(ir_mark, start_stop_pause);
 
         if (sendCount == 0 || sendCount == 1) {
           basic.pause(5 * MAX_LENGTH_MS);
