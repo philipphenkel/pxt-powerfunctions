@@ -1,6 +1,6 @@
 {
     "name": "powerfunctions",
-    "version": "1.3.3",
+    "version": "1.4.0",
     "description": " Control your Lego® Power Functions motors using an infrared LED. This package is neither endorsed nor authorized by the LEGO Group.",
     "license": "MIT",
     "dependencies": {
