@@ -1,14 +1,14 @@
 language: node_js
 node_js:
-    - "5.7.0"
+  - "8.10.0"
 script:
-    - "npm install -g pxt"
-    - "pxt target microbit"
-    - "pxt install"
-    - "pxt build"
-    - "pxt test"
+  - "npm install -g pxt"
+  - "pxt target microbit"
+  - "pxt install"
+  - "pxt build --cloud"
+  - "pxt test"
 sudo: false
 cache:
-    directories:
+  directories:
     - npm_modules
     - pxt_modules
