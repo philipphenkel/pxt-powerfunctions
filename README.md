@@ -3,6 +3,8 @@
 Control your LEGO® Power Functions motors using your micro:bit or Calliope-Mini, an infrared LED and MakeCode.
 This extension turns your device into a remote control for your Power Functions devices.
 
+A project using this extension is documented on [hackster.io](https://www.hackster.io/philipp-henkel/lego-power-functions-ir-sender-for-micro-bit-aecc10)
+
 ## Installation
 
 Open MakeCode and select '+ Extensions' in the 'Advanced' menu. You need to enter our project URL https://github.com/philipphenkel/pxt-powerfunctions in the search field, hit return and then select the powerfunctions extension.
@@ -53,5 +55,5 @@ Licensed under the MIT License (MIT). See LICENSE file for more details.
 
 ## Supported targets
 
-* for PXT/microbit
-* for PXT/calliope
+- for PXT/microbit
+- for PXT/calliope
