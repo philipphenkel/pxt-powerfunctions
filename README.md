@@ -1,4 +1,6 @@
-# pxt-powerfunctions - Power Functions IR Sender
+# Power Functions IR Sender
+
+[![Build Status](https://travis-ci.org/philipphenkel/pxt-powerfunctions.svg?branch=master)](https://travis-ci.org/philipphenkel/pxt-powerfunctions)
 
 Control your LEGO® Power Functions motors using your micro:bit or Calliope-Mini, an infrared LED and MakeCode.
 This extension turns your device into a remote control for your Power Functions devices.
@@ -11,7 +13,7 @@ Open MakeCode and select '+ Extensions' in the 'Advanced' menu. You need to ente
 
 # Documentation
 
-## powerfunctions.initializeIrLed
+## powerfunctions.connectIrLed
 
 Configures the infrared LED pin. A 940 nm emitting diode is required.
 
@@ -22,6 +24,56 @@ powerfunctions.connectIrLed(sb.servo(AnalogPin.P0)
 ### Parameters
 
 - `pin` - analog pin with an attached IR-emitting LED
+
+## powerfunctions.setSpeed
+
+Sets the speed of a motor.
+
+```sig
+powerfunctions.setSpeed(PowerFunctionsMotor.Red1, 3)
+```
+
+### Parameters
+
+- `motor` - the motor
+- `speed` - the speed of the motor from `-7` to `7`.
+
+## powerfunctions.brake
+
+Brakes then float. The motor's power is quickly reversed and thus the motor will stop abruptly.
+
+```sig
+powerfunctions.brake(PowerFunctionsMotor.Red1)
+```
+
+### Parameters
+
+- `motor` - the motor
+
+## powerfunctions.float
+
+Floats a motor to stop. The motor's power is switched off and thus the motor will roll to a stop.
+
+```sig
+powerfunctions.float(PowerFunctionsMotor.Red1)
+```
+
+### Parameters
+
+- `motor` - the motor
+
+## powerfunctions.setMotorDirection
+
+Configures a motor direction.
+
+```sig
+powerfunctions.setMotorDirection(PowerFunctionsMotor.Red1, PowerFunctionsDirection.Right)
+```
+
+### Parameters
+
+- `motor` - the motor
+- `direction` - the direction of the motor
 
 ## MakeCode Example
 

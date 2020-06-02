@@ -133,7 +133,7 @@ namespace powerfunctions {
   }
 
   /**
-   * Set speed of a motor.
+   * Sets the speed of a motor.
    * @param motor the motor
    * @param speed speed of the motor, eg: 3
    */
@@ -154,7 +154,7 @@ namespace powerfunctions {
   }
 
   /**
-   * Brake then float.
+   * Brakes then float.
    * The motor's power is quickly reversed and thus the motor will stop abruptly.
    * @param motor the motor
    */
@@ -167,7 +167,7 @@ namespace powerfunctions {
   }
 
   /**
-   * Float a motor to stop.
+   * Floats a motor to stop.
    * The motor's power is switched off and thus the motor will roll to a stop.
    * @param motor the motor
    */
