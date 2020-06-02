@@ -11,13 +11,12 @@ Open MakeCode and select '+ Extensions' in the 'Advanced' menu. You need to ente
 
 ## MakeCode Blocks Example
 
-![alt text](https://github.com/philipphenkel/pxt-powerfunctions/raw/master/code_example.png "MakeCode Blocks Example")
+## MakeCode Example
 
-## MakeCode JavaScript Example
-
-```javascript
+```blocks
 basic.showIcon(IconNames.Heart);
 powerfunctions.initializeIrLed(AnalogPin.P1);
+
 powerfunctions.setMotorDirection(
   PowerFunctionsMotor.Blue1,
   PowerFunctionsDirection.Backward
@@ -56,4 +55,3 @@ Licensed under the MIT License (MIT). See LICENSE file for more details.
 ## Supported targets
 
 - for PXT/microbit
-- for PXT/calliope
