@@ -9,7 +9,19 @@ A project using this extension is documented on [hackster.io](https://www.hackst
 
 Open MakeCode and select '+ Extensions' in the 'Advanced' menu. You need to enter our project URL https://github.com/philipphenkel/pxt-powerfunctions in the search field, hit return and then select the powerfunctions extension.
 
-## MakeCode Blocks Example
+# Documentation
+
+## powerfunctions.initializeIrLed
+
+Configures the infrared LED pin. A 940 nm emitting diode is required.
+
+```sig
+powerfunctions.connectIrLed(sb.servo(AnalogPin.P0)
+```
+
+### Parameters
+
+- `pin` - analog pin with an attached IR-emitting LED
 
 ## MakeCode Example
 

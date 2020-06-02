@@ -1,6 +1,6 @@
 {
-  "PowerFunctionsDirection.Forward|block": "vorwärts",
-  "PowerFunctionsDirection.Backward|block": "rückwärts",
+  "PowerFunctionsDirection.Left|block": "links",
+  "PowerFunctionsDirection.Right|block": "rechts",
   "PowerFunctionsOutput.Red|block": "rot",
   "PowerFunctionsOutput.Blue|block": "blau",
   "PowerFunctionsMotor.Red1|block": "rot | Kanal 1",

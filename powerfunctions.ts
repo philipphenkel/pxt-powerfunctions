@@ -17,10 +17,10 @@ enum PowerFunctionsChannel {
 }
 
 enum PowerFunctionsDirection {
-  //% block="forward"
-  Forward = 1,
-  //% block="backward"
-  Backward = -1,
+  //% block="left"
+  Left = 1,
+  //% block="right"
+  Right = -1,
 }
 
 enum PowerFunctionsOutput {
@@ -112,22 +112,22 @@ namespace powerfunctions {
    * Configures the infrared LED pin. A 940 nm emitting diode is required.
    * @param pin pin an attached IR LED
    */
-  //% blockId=pf_initialize_ir_led
-  //% block="initialize IR LED on pin %pin"
+  //% blockId=pf_connect_ir_led
+  //% block="connect IR LED at pin %pin"
   //% weight=90
   //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4 pin.fieldOptions.tooltips="false"
-  export function initializeIrLed(pin: AnalogPin) {
+  export function connectIrLed(pin: AnalogPin) {
     state = {
       irDevice: new InfraredDevice(pin),
       motorDirections: [
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
-        PowerFunctionsDirection.Forward,
+        PowerFunctionsDirection.Left,
+        PowerFunctionsDirection.Left,
+        PowerFunctionsDirection.Left,
+        PowerFunctionsDirection.Left,
+        PowerFunctionsDirection.Left,
+        PowerFunctionsDirection.Left,
+        PowerFunctionsDirection.Left,
+        PowerFunctionsDirection.Left,
       ],
     };
   }
