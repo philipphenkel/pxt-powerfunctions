@@ -21,7 +21,7 @@
   "PowerFunctionsOutput.Red|block": "赤",
   "powerfunctions.brake|block": "モーター %motor をブレーキ",
   "powerfunctions.float|block": "モーター %motor を停止",
-  "powerfunctions.initializeIrLed|block": "%pin に接続した赤外線LEDを初期化",
+  "powerfunctions.connectIrLed|block": "%pin に接続した赤外線LEDを初期化",
   "powerfunctions.setMotorDirection|block": "モーター %motor | の方向を %direction | にセット",
   "powerfunctions.setSpeed|block": "モーター %motor | の速度を %speed | にセット",
   "powerfunctions|block": "パワーファンクション",

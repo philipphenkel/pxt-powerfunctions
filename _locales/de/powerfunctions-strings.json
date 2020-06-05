@@ -14,8 +14,8 @@
   "powerfunctions.brake|block": "bremse Motor %motor",
   "powerfunctions.float|block": "lasse Motor %motor | ausrollen",
   "powerfunctions.setSpeed|block": "schalte | Motor %motor | auf %speed",
-  "powerfunctions.initializeIrLed|block": "initialisiere IR LED an Pin %pin",
+  "powerfunctions.connectIrLed|block": "verbinde IR LED an Pin %pin",
   "powerfunctions.setMotorDirection|block": "setze Richtung | von Motor %motor | auf %direction",
-   "powerfunctions|block": "Power Functions",
+  "powerfunctions|block": "Power Functions",
   "{id:category}Power Functions": "Power Functions"
 }

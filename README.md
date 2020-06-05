@@ -79,7 +79,7 @@ powerfunctions.setMotorDirection(PowerFunctionsMotor.Red1, PowerFunctionsDirecti
 
 ```blocks
 basic.showIcon(IconNames.Heart);
-powerfunctions.initializeIrLed(AnalogPin.P1);
+powerfunctions.connectIrLed(AnalogPin.P1);
 
 powerfunctions.setMotorDirection(
   PowerFunctionsMotor.Blue1,
