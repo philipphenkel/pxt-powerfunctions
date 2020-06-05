@@ -18,7 +18,7 @@ Open MakeCode and select '+ Extensions' in the 'Advanced' menu. You need to ente
 Configures the infrared LED pin. A 940 nm emitting diode is required.
 
 ```sig
-powerfunctions.connectIrLed(sb.servo(AnalogPin.P0)
+powerfunctions.connectIrLed(AnalogPin.P0)
 ```
 
 ### Parameters
